@@ -1,13 +1,29 @@
 {
     "name": "user-secrets",
     "displayName": ".NET Core User Secrets",
-    "description": "",
+    "description": "Extension mimicking Visual Studio's \"Manage User Secrets\" functionality.",
+    "icon": "img/logo.png",
+    "publisher": "adrianwilczynski",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/AdrianWilczynski/UserSecrets.git"
+    },
     "version": "0.0.1",
     "engines": {
         "vscode": "^1.33.0"
     },
     "categories": [
         "Other"
+    ],
+    "keywords": [
+        ".NET",
+        ".NET Core",
+        "C#",
+        "CSharp",
+        "ASP.NET Core",
+        "User Secrets",
+        "Secret",
+        "Secrets"
     ],
     "activationEvents": [
         "onCommand:extension.manageUserSecrets"
