@@ -51,7 +51,7 @@ function generateUserUserSecretsIdElement(id: string, inline = false, indentatio
     if (inline) {
         return `<UserSecretsId>${id}</UserSecretsId>`;
     } else {
-        return `${indentation}<UserSecretsId>${id}</UserSecretsId>${os.EOL}${indentation}`;
+        return `${indentation || '  '}<UserSecretsId>${id}</UserSecretsId>${os.EOL}${indentation}`;
     }
 }
 
