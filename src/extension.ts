@@ -9,8 +9,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() { }
 
-async function manageUserSecrets(uri: vscode.Uri) {
-    const csproj = await vscode.workspace.openTextDocument(uri);
+async function manageUserSecrets(uri: vscode.Uri | undefined) {
+    const csprojUri = uri || getOpenCsprojUri();
+    if (!csprojUri) {
+        return;
+    }
+
+    const csproj = await vscode.workspace.openTextDocument(csprojUri);
 
     const element = getUserSecretsIdElement(csproj);
     let id: string | undefined;
@@ -48,3 +53,9 @@ async function manageUserSecrets(uri: vscode.Uri) {
     await vscode.window.showTextDocument(secretsJson);
 }
 
+function getOpenCsprojUri() {
+    if (!vscode.window.activeTextEditor || !vscode.window.activeTextEditor.document.fileName.endsWith('.csproj')) {
+        return;
+    }
+    return vscode.window.activeTextEditor.document.uri;
+}
