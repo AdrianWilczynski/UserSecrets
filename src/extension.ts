@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { getUserSecretsIdElement, getIdFromElement, getPropertyGroupClosingTagLinePosition, insertUserSecretsIdElement } from './csproj';
+import { getUserSecretsIdElement, getIdFromElement, getPropertyGroupClosingTagLinePosition as getPropertyGroupClosingTagPosition, insertUserSecretsIdElement } from './csproj';
 import { shouldGenerate } from './prompt';
 import { getSecretsPath, ensureSecretsExist } from './secretsJson';
 
@@ -28,7 +28,7 @@ async function manageUserSecrets(uri: vscode.Uri | undefined) {
             return;
         }
     } else if (await shouldGenerate()) {
-        const position = getPropertyGroupClosingTagLinePosition(csproj);
+        const position = getPropertyGroupClosingTagPosition(csproj);
         if (!position) {
             vscode.window.showWarningMessage(
                 'Unable to find a PropertyGroup element in this .csproj file.');
