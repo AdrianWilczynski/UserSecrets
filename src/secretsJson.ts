@@ -3,33 +3,15 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 
 export function getSecretsPath(id: string) {
-    return getSecretsPathForSystem(id, getOperatingSystem());
+    return getSecretsPathForSystem(id);
 }
 
-enum OperatingSystem {
-    Windows,
-    Linux,
-    macOS,
-    Other
-}
+function getSecretsPathForSystem(id: string) {
+    const platform = os.platform();
 
-function getOperatingSystem() {
-    switch (os.platform()) {
-        case 'win32':
-            return OperatingSystem.Windows;
-        case 'linux':
-            return OperatingSystem.Linux;
-        case 'darwin':
-            return OperatingSystem.macOS;
-        default:
-            return OperatingSystem.Other;
-    }
-}
-
-function getSecretsPathForSystem(id: string, system: OperatingSystem) {
-    if (system === OperatingSystem.Windows) {
+    if (platform === 'win32') {
         return path.join(os.homedir(), 'AppData', 'Roaming', 'Microsoft', 'UserSecrets', id, 'secrets.json');
-    } else if (system === OperatingSystem.Linux || system === OperatingSystem.macOS) {
+    } else if (platform === 'linux' || platform === 'darwin') {
         return path.join(os.homedir(), '.microsoft', 'usersecrets', id, 'secrets.json');
     } else {
         return;
