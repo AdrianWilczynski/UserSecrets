@@ -3,10 +3,6 @@ import * as path from 'path';
 import * as fse from 'fs-extra';
 
 export function getSecretsPath(id: string) {
-    return getSecretsPathForSystem(id);
-}
-
-function getSecretsPathForSystem(id: string) {
     const platform = os.platform();
 
     if (platform === 'win32') {
