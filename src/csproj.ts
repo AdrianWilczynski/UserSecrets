@@ -6,13 +6,14 @@ const elements = {
     Project: 'Project',
     PropertyGroup: 'PropertyGroup',
     UserSecretsId: 'UserSecretsId'
-}
+};
 
 export async function getUserSecretsId(csproj: vscode.TextDocument) {
     const content = csproj.getText();
     const parsed = await xml2js.parseStringPromise(content);
 
-    const id = parsed[elements.Project] &&
+    const id = parsed &&
+        parsed[elements.Project] &&
         parsed[elements.Project][elements.PropertyGroup] &&
         parsed[elements.Project][elements.PropertyGroup][0] &&
         parsed[elements.Project][elements.PropertyGroup][0][elements.UserSecretsId] &&
@@ -25,9 +26,13 @@ export async function insertUserSecretsId(csproj: vscode.TextDocument) {
     const id = uuid();
 
     const content = csproj.getText();
-    const parsed = await xml2js.parseStringPromise(content);
+    let parsed = await xml2js.parseStringPromise(content);
 
-    if (!parsed[elements.Project]) {
+    if (!parsed) {
+        parsed = {};
+    }
+
+    if (!parsed[elements.Project] || typeof parsed[elements.Project] !== 'object') {
         parsed[elements.Project] = {};
     }
 
@@ -35,9 +40,8 @@ export async function insertUserSecretsId(csproj: vscode.TextDocument) {
         parsed[elements.Project][elements.PropertyGroup] = [];
     }
 
-    if (!parsed[elements.Project][elements.PropertyGroup][0] === undefined) {
-        (parsed[elements.Project][elements.PropertyGroup] as any[]).push({});
-    } else if (typeof parsed[elements.Project][elements.PropertyGroup][0] !== 'object') {
+    if (!parsed[elements.Project][elements.PropertyGroup][0] === undefined
+        || typeof parsed[elements.Project][elements.PropertyGroup][0] !== 'object') {
         parsed[elements.Project][elements.PropertyGroup][0] = {};
     }
 
@@ -45,9 +49,7 @@ export async function insertUserSecretsId(csproj: vscode.TextDocument) {
         parsed[elements.Project][elements.PropertyGroup][0][elements.UserSecretsId] = [];
     }
 
-    if (!parsed[elements.Project][elements.PropertyGroup][0][elements.UserSecretsId][0] === undefined) {
-        (parsed[elements.Project][elements.PropertyGroup][0][elements.UserSecretsId] as any[]).push(id);
-    } else if (!parsed[elements.Project][elements.PropertyGroup][0][elements.UserSecretsId][0]
+    if (!parsed[elements.Project][elements.PropertyGroup][0][elements.UserSecretsId][0]
         || typeof !parsed[elements.Project][elements.PropertyGroup][0][elements.UserSecretsId][0] !== 'string') {
         parsed[elements.Project][elements.PropertyGroup][0][elements.UserSecretsId][0] = id;
     }
