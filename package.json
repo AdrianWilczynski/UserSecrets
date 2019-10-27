@@ -82,7 +82,9 @@
     "dependencies": {
         "@types/fs-extra": "^5.0.5",
         "@types/uuid": "^3.4.4",
+        "@types/xml2js": "^0.4.5",
         "fs-extra": "^7.0.1",
-        "uuid": "^3.3.2"
+        "uuid": "^3.3.2",
+        "xml2js": "^0.4.22"
     }
 }

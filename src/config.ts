@@ -3,8 +3,7 @@ import * as vscode from 'vscode';
 const configSection = 'userSecrets.ask';
 
 export function shouldAsk() {
-    const config = vscode.workspace
-        .getConfiguration()
+    const config = vscode.workspace.getConfiguration()
         .get(configSection);
 
     if (config === undefined) {
@@ -14,8 +13,7 @@ export function shouldAsk() {
     return !!config;
 }
 
-export function dontAskAgain() {
-    vscode.workspace
-        .getConfiguration()
+export async function dontAskAgain() {
+    await vscode.workspace.getConfiguration()
         .update(configSection, false, vscode.ConfigurationTarget.Global);
 }

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { getUserSecretsIdElement, getIdFromElement, getPropertyGroupClosingTagLinePosition as getPropertyGroupClosingTagPosition, insertUserSecretsIdElement } from './csproj';
+import { getUserSecretsId, insertUserSecretsId } from './csproj';
 import { shouldGenerate } from './prompt';
 import { getSecretsPath, ensureSecretsExist } from './secretsJson';
 
@@ -10,52 +10,45 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() { }
 
 async function manageUserSecrets(uri: vscode.Uri | undefined) {
-    const csprojUri = uri || getOpenCsprojUri();
-    if (!csprojUri) {
-        return;
-    }
+    try {
+        const csprojUri = uri || getOpenCsprojUri();
+        if (!csprojUri) {
+            return;
+        }
 
-    const csproj = await vscode.workspace.openTextDocument(csprojUri);
+        const csproj = await vscode.workspace.openTextDocument(csprojUri);
 
-    const element = getUserSecretsIdElement(csproj);
-    let id: string | undefined;
+        let id = await getUserSecretsId(csproj);
 
-    if (element) {
-        id = getIdFromElement(element);
+        if (!id && await shouldGenerate()) {
+            id = await insertUserSecretsId(csproj);
+        }
+
         if (!id) {
-            vscode.window.showWarningMessage(
-                "There is a UserSecretsId element in this .csproj file but it doesn't seem to contain a valid identifier.");
-            return;
-        }
-    } else if (await shouldGenerate()) {
-        const position = getPropertyGroupClosingTagPosition(csproj);
-        if (!position) {
-            vscode.window.showWarningMessage(
-                'Unable to find a PropertyGroup element in this .csproj file.');
             return;
         }
 
-        id = await insertUserSecretsIdElement(position, csproj);
-    } else {
-        return;
+        const secretsPath = getSecretsPath(id);
+        if (!secretsPath) {
+            vscode.window.showWarningMessage('Unable to determine "secrets.json" file location.');
+            return;
+        }
+
+        await ensureSecretsExist(secretsPath);
+
+        const secretsJson = await vscode.workspace.openTextDocument(secretsPath);
+        await vscode.window.showTextDocument(secretsJson);
+    } catch (error) {
+        if (error instanceof Error && error.message) {
+            vscode.window.showErrorMessage(error.message);
+        }
     }
-
-    const secretsPath = getSecretsPath(id);
-    if (!secretsPath) {
-        vscode.window.showWarningMessage(
-            'Unable to determine secrets.json file location.');
-        return;
-    }
-
-    await ensureSecretsExist(secretsPath);
-
-    const secretsJson = await vscode.workspace.openTextDocument(secretsPath);
-    await vscode.window.showTextDocument(secretsJson);
 }
 
 function getOpenCsprojUri() {
     if (!vscode.window.activeTextEditor || !vscode.window.activeTextEditor.document.fileName.endsWith('.csproj')) {
         return;
     }
+
     return vscode.window.activeTextEditor.document.uri;
 }
