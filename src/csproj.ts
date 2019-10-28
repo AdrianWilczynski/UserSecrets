@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as os from 'os';
 import { v4 as uuid } from 'uuid';
 import * as xml2js from 'xml2js';
 
@@ -54,7 +55,10 @@ export async function insertUserSecretsId(csproj: vscode.TextDocument) {
         parsed[elements.Project][elements.PropertyGroup][0][elements.UserSecretsId][0] = id;
     }
 
-    const updatedContent = new xml2js.Builder({ headless: true }).buildObject(parsed);
+    const updatedContent = new xml2js.Builder({ headless: true }).buildObject(parsed)
+        .replace(/&#xD;/g, '\r')
+        .replace(/^  <(?=\w)/gm, os.EOL + '  <')
+        .replace(/(?=<\/Project>$)/, os.EOL);
 
     const fullRange = new vscode.Range(
         0, 0,
