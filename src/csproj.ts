@@ -40,7 +40,7 @@ export async function insertUserSecretsId(csproj: vscode.TextDocument) {
         parsed[elements.Project][elements.PropertyGroup] = [];
     }
 
-    if (!parsed[elements.Project][elements.PropertyGroup][0] === undefined
+    if (!parsed[elements.Project][elements.PropertyGroup][0]
         || typeof parsed[elements.Project][elements.PropertyGroup][0] !== 'object') {
         parsed[elements.Project][elements.PropertyGroup][0] = {};
     }
