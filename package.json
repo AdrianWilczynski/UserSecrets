@@ -37,7 +37,7 @@
                     "userSecrets.ask": {
                         "type": "boolean",
                         "default": true,
-                        "description": "Ask before inserting auto-generated UserSecretsId element into the .csproj file.",
+                        "description": "Ask before inserting auto-generated \"UserSecretsId\" element into the \".csproj\" file.",
                         "scope": "window"
                     }
                 }

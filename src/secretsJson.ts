@@ -21,5 +21,5 @@ export async function ensureSecretsExist(secretsPath: string) {
 }
 
 function getEmptyJsonFileContent() {
-    return `{${os.EOL}${os.EOL}}`;
+    return `{${os.EOL}    ${os.EOL}}`;
 }
