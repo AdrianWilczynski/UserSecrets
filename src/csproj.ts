@@ -8,7 +8,7 @@ const elements = {
     UserSecretsId: 'UserSecretsId'
 };
 
-export async function getUserSecretsId(csproj: vscode.TextDocument) {
+export async function getUserSecretsId(csproj: vscode.TextDocument): Promise<string | undefined> {
     const content = csproj.getText();
     const parsed = await xml2js.parseStringPromise(content);
 
