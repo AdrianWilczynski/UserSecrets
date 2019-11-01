@@ -17,7 +17,7 @@ export async function getUserSecretsId(csprojContent: string): Promise<string | 
         parsed[elements.Project][elements.PropertyGroup][0][elements.UserSecretsId] &&
         parsed[elements.Project][elements.PropertyGroup][0][elements.UserSecretsId][0];
 
-    return !!id || typeof id !== 'string' ? id : undefined;
+    return !!id && typeof id === 'string' ? id : undefined;
 }
 
 export async function insertUserSecretsId(csprojContent: string, id: string) {
