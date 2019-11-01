@@ -16,10 +16,10 @@ export function getSecretsPath(id: string) {
 
 export async function ensureSecretsExist(secretsPath: string) {
     if (!fse.existsSync(secretsPath)) {
-        await fse.outputFile(secretsPath, getEmptyJsonFileContent());
+        await fse.outputFile(secretsPath, emptyJsonFileContent());
     }
 }
 
-function getEmptyJsonFileContent() {
+function emptyJsonFileContent() {
     return `{${os.EOL}    ${os.EOL}}`;
 }

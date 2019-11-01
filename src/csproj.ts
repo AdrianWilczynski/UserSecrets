@@ -1,6 +1,4 @@
-import * as vscode from 'vscode';
 import * as os from 'os';
-import { v4 as uuid } from 'uuid';
 import * as xml2js from 'xml2js';
 
 const elements = {
@@ -9,9 +7,8 @@ const elements = {
     UserSecretsId: 'UserSecretsId'
 };
 
-export async function getUserSecretsId(csproj: vscode.TextDocument): Promise<string | undefined> {
-    const content = csproj.getText();
-    const parsed = await xml2js.parseStringPromise(content);
+export async function getUserSecretsId(csprojContent: string): Promise<string | undefined> {
+    const parsed = await xml2js.parseStringPromise(csprojContent);
 
     const id = parsed &&
         parsed[elements.Project] &&
@@ -23,11 +20,8 @@ export async function getUserSecretsId(csproj: vscode.TextDocument): Promise<str
     return !!id || typeof id !== 'string' ? id : undefined;
 }
 
-export async function insertUserSecretsId(csproj: vscode.TextDocument) {
-    const id = uuid();
-
-    const content = csproj.getText();
-    let parsed = await xml2js.parseStringPromise(content);
+export async function insertUserSecretsId(csprojContent: string, id: string) {
+    let parsed = await xml2js.parseStringPromise(csprojContent);
 
     if (!parsed) {
         parsed = {};
@@ -57,18 +51,9 @@ export async function insertUserSecretsId(csproj: vscode.TextDocument) {
 
     const updatedContent = new xml2js.Builder({ headless: true }).buildObject(parsed)
         .replace(/&#xD;/g, '\r')
-        .replace(/^  <(?=\w)/gm, os.EOL + '  <')
-        .replace(/(?=<\/Project>$)/, os.EOL);
+        .replace(/^(?=  <\w)/gm, os.EOL)
+        .replace(/(?=<\/Project>$)/, os.EOL)
+        .replace(/(?=\/>$)/gm, ' ');
 
-    const fullRange = new vscode.Range(
-        0, 0,
-        csproj.lineCount - 1, csproj.lineAt(csproj.lineCount - 1).range.end.character);
-
-    const edit = new vscode.WorkspaceEdit();
-    edit.replace(csproj.uri, fullRange, updatedContent);
-
-    await vscode.workspace.applyEdit(edit);
-    await csproj.save();
-
-    return id;
+    return updatedContent;
 }

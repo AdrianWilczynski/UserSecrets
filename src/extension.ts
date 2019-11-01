@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import { getUserSecretsId, insertUserSecretsId } from './csproj';
 import { shouldGenerate } from './prompt';
 import { getSecretsPath, ensureSecretsExist } from './secretsJson';
+import { override } from './document';
+import { v4 as uuid } from 'uuid';
 
 export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand('extension.manageUserSecrets', manageUserSecrets));
@@ -17,11 +19,13 @@ async function manageUserSecrets(uri: vscode.Uri | undefined) {
         }
 
         const csproj = await vscode.workspace.openTextDocument(csprojUri);
+        const csprojContent = csproj.getText();
 
-        let id = await getUserSecretsId(csproj);
+        let id = await getUserSecretsId(csprojContent);
 
         if (!id && await shouldGenerate()) {
-            id = await insertUserSecretsId(csproj);
+            id = uuid();
+            await override(csproj, await insertUserSecretsId(csprojContent, id));
         }
 
         if (!id) {
